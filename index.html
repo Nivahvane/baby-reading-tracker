@@ -140,6 +140,20 @@
   @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
   .burst { position:fixed; pointer-events:none; z-index:999; animation:burstAnim 0.8s ease forwards; }
   @keyframes burstAnim { 0%{opacity:1;transform:scale(0.5) translateY(0)} 100%{opacity:0;transform:scale(1.5) translateY(-60px)} }
+
+  /* TRACE MODE */
+  .trace-info { background:white; border-radius:24px; padding:20px; text-align:center; box-shadow:0 6px 24px #6B3FA015; margin-bottom:16px; }
+  .trace-emoji { font-size:60px; display:block; margin-bottom:6px; }
+  .trace-word-label { font-family:'Fredoka One',cursive; font-size:22px; color:var(--coral); margin-bottom:4px; }
+  .trace-instruction { font-size:13px; color:var(--soft); font-weight:700; }
+  .trace-area { background:white; border-radius:28px; padding:28px 16px; box-shadow:0 8px 30px #6B3FA020; margin-bottom:14px; display:flex; justify-content:center; gap:10px; flex-wrap:nowrap; user-select:none; touch-action:none; }
+  .trace-letter { width:72px; height:88px; border-radius:18px; border:4px solid #E8E0F0; background:var(--cream); display:flex; flex-direction:column; align-items:center; justify-content:center; font-family:'Fredoka One',cursive; font-size:42px; color:#C8C0D8; transition:all 0.2s; position:relative; box-shadow:0 3px 10px #6B3FA010; }
+  .trace-letter.active { border-color:var(--gold); background:#FFFBE8; color:var(--gold); transform:scale(1.12); box-shadow:0 6px 20px #F5C84250; }
+  .trace-letter.traced { border-color:var(--plum); background:linear-gradient(135deg,#F0E8FF,#E8F5EE); color:var(--plum); transform:scale(1.05); }
+  .trace-letter .trace-sub { font-family:'Nunito',sans-serif; font-size:10px; font-weight:800; color:var(--soft-plum); margin-top:2px; }
+  .trace-letter.traced .trace-sub { color:var(--plum); }
+  .trace-status { text-align:center; font-family:'Fredoka One',cursive; font-size:16px; color:var(--plum); min-height:28px; padding:4px 0; }
+  @keyframes traceGlow { 0%,100%{box-shadow:0 0 0 0 #F5C84260} 50%{box-shadow:0 0 0 14px #F5C84200} }
 </style>
 </head>
 <body>
@@ -187,8 +201,9 @@
   <!-- ══ PHONICS TAB ══ -->
   <div id="phonicsTab" style="display:none">
     <div class="mode-toggle">
-      <button class="mode-btn active" onclick="switchMode('baby',this)">👶 Baby (1yr)<br><small style="font-size:10px;font-family:Nunito,sans-serif;font-weight:600">Letters &amp; Sounds</small></button>
-      <button class="mode-btn" onclick="switchMode('toddler',this)">🧒 Toddler (4yrs)<br><small style="font-size:10px;font-family:Nunito,sans-serif;font-weight:600">Spell Words</small></button>
+      <button class="mode-btn active" onclick="switchMode('baby',this)">👶 Baby<br><small style="font-size:10px;font-family:Nunito,sans-serif;font-weight:600">Letters</small></button>
+      <button class="mode-btn" onclick="switchMode('toddler',this)">🧒 Spell<br><small style="font-size:10px;font-family:Nunito,sans-serif;font-weight:600">Words</small></button>
+      <button class="mode-btn" onclick="switchMode('trace',this)">👆 Trace<br><small style="font-size:10px;font-family:Nunito,sans-serif;font-weight:600">& Read</small></button>
     </div>
 
     <div class="score-strip">
@@ -225,8 +240,23 @@
       <div class="phonics-keyboard" id="phonicsKeyboard"></div>
       <button class="next-word-btn" onclick="nextWord()">Next Word ›</button>
     </div>
-  </div>
 
+    <!-- ══ TRACE & READ MODE ══ -->
+    <div id="traceMode" style="display:none">
+      <div class="trace-info">
+        <span class="trace-emoji" id="traceEmoji">🐱</span>
+        <div class="trace-word-label" id="traceWordLabel">CAT · Paka</div>
+        <div class="trace-instruction">Slide your finger slowly across each letter 👆</div>
+      </div>
+      <div class="trace-area" id="traceArea"></div>
+      <div class="trace-status" id="traceStatus">✨ Touch the first letter to begin!</div>
+      <div style="display:flex;gap:10px;margin-top:16px">
+        <button class="next-word-btn" style="flex:1;margin:0" onclick="resetTrace()">🔄 Again</button>
+        <button class="next-word-btn" style="flex:1;margin:0;background:var(--coral)" onclick="nextTraceWord()">Next Word ›</button>
+      </div>
+    </div>
+
+  </div>
 </div>
 
 <!-- Celebration -->
@@ -309,7 +339,9 @@ function switchMode(mode, btn) {
   btn.classList.add('active');
   document.getElementById('babyMode').style.display = mode === 'baby' ? 'block' : 'none';
   document.getElementById('toddlerMode').style.display = mode === 'toddler' ? 'block' : 'none';
+  document.getElementById('traceMode').style.display = mode === 'trace' ? 'block' : 'none';
   if (mode === 'toddler') renderWord();
+  if (mode === 'trace') renderTraceWord();
 }
 
 // ══ BABY MODE ══
@@ -477,6 +509,156 @@ function playTone(correct) {
 function updateScores() {
   document.getElementById('learnedCount').textContent = learnedLetters.length;
   document.getElementById('correctCount').textContent = totalCorrect;
+}
+
+
+// ══ TRACE & READ MODE ══
+let traceWordIdx = 0;
+let traceLetterIdx = 0;
+let traceActive = false;
+let lastSpokenIdx = -1;
+
+const TRACE_WORDS = [
+  {word:'CAT', emoji:'🐱', hint:'Paka',   sounds:['Kuh','Aaa','Tuh']},
+  {word:'DOG', emoji:'🐕', hint:'Mbwa',   sounds:['Duh','Oh','Guh']},
+  {word:'SUN', emoji:'☀️', hint:'Jua',    sounds:['Sss','Uh','Nnn']},
+  {word:'HEN', emoji:'🐓', hint:'Kuku',   sounds:['Hhh','Eh','Nnn']},
+  {word:'CUP', emoji:'☕', hint:'Kikombe',sounds:['Kuh','Uh','Puh']},
+  {word:'BED', emoji:'🛏️', hint:'Kitanda',sounds:['Buh','Eh','Duh']},
+  {word:'POT', emoji:'🍲', hint:'Sufuria',sounds:['Puh','Oh','Tuh']},
+  {word:'BUS', emoji:'🚌', hint:'Basi',   sounds:['Buh','Uh','Sss']},
+  {word:'MAP', emoji:'🗺️', hint:'Ramani', sounds:['Mmm','Aaa','Puh']},
+  {word:'ANT', emoji:'🐜', hint:'Sisimizi',sounds:['Aaa','Nnn','Tuh']},
+];
+
+function renderTraceWord() {
+  const w = TRACE_WORDS[traceWordIdx];
+  traceLetterIdx = 0;
+  traceActive = false;
+  lastSpokenIdx = -1;
+  document.getElementById('traceEmoji').textContent = w.emoji;
+  document.getElementById('traceWordLabel').textContent = w.word + ' · ' + w.hint;
+  document.getElementById('traceStatus').textContent = '✨ Touch the first letter to begin!';
+
+  const area = document.getElementById('traceArea');
+  area.innerHTML = w.word.split('').map((l, i) => `
+    <div class="trace-letter" id="tl${i}" data-idx="${i}">
+      ${l}
+      <span class="trace-sub">${w.sounds[i]}</span>
+    </div>
+  `).join('');
+
+  // Highlight first letter
+  const first = document.getElementById('tl0');
+  if (first) first.classList.add('active');
+
+  // Set up touch/mouse events on the area
+  area.addEventListener('touchstart', handleTraceStart, {passive:false});
+  area.addEventListener('touchmove', handleTraceMove, {passive:false});
+  area.addEventListener('touchend', handleTraceEnd, {passive:false});
+  area.addEventListener('mousedown', handleTraceStart);
+  area.addEventListener('mousemove', handleTraceMove);
+  area.addEventListener('mouseup', handleTraceEnd);
+}
+
+function getLetterAtPoint(x, y) {
+  const w = TRACE_WORDS[traceWordIdx];
+  for (let i = 0; i < w.word.length; i++) {
+    const el = document.getElementById('tl' + i);
+    if (!el) continue;
+    const rect = el.getBoundingClientRect();
+    if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) return i;
+  }
+  return -1;
+}
+
+function handleTraceStart(e) {
+  e.preventDefault();
+  traceActive = true;
+  const pt = e.touches ? e.touches[0] : e;
+  const idx = getLetterAtPoint(pt.clientX, pt.clientY);
+  if (idx === 0) activateTraceLetter(0);
+}
+
+function handleTraceMove(e) {
+  if (!traceActive) return;
+  e.preventDefault();
+  const pt = e.touches ? e.touches[0] : e;
+  const idx = getLetterAtPoint(pt.clientX, pt.clientY);
+  if (idx >= 0 && idx === traceLetterIdx && idx !== lastSpokenIdx) {
+    activateTraceLetter(idx);
+  }
+}
+
+function handleTraceEnd(e) {
+  traceActive = false;
+}
+
+function activateTraceLetter(idx) {
+  const w = TRACE_WORDS[traceWordIdx];
+  lastSpokenIdx = idx;
+
+  // Mark previous as traced
+  if (idx > 0) {
+    const prev = document.getElementById('tl' + (idx - 1));
+    if (prev) { prev.classList.remove('active'); prev.classList.add('traced'); }
+  }
+
+  // Activate current
+  const cur = document.getElementById('tl' + idx);
+  if (cur) cur.classList.add('active');
+
+  // Speak letter sound
+  const letter = w.word[idx];
+  const sound = w.sounds[idx];
+  speak(letter + '... ' + sound);
+  playTone(true);
+  spawnBurstAt(cur);
+
+  document.getElementById('traceStatus').textContent = `"${letter}" says ${sound}`;
+
+  traceLetterIdx = idx + 1;
+
+  // Check if word complete
+  if (idx === w.word.length - 1) {
+    setTimeout(() => {
+      cur.classList.remove('active');
+      cur.classList.add('traced');
+      document.getElementById('traceStatus').textContent = '🎉 ' + w.word + '!';
+      speak(w.word + '. ' + w.word + '. ' + w.hint);
+      totalCorrect++;
+      updateScores();
+      setTimeout(() => showCelebration('🎊', w.word + '!', w.hint + ' — Well read! Hongera! 🇰🇪'), 800);
+    }, 300);
+  }
+}
+
+function spawnBurstAt(el) {
+  if (!el) return;
+  const rect = el.getBoundingClientRect();
+  const b = document.createElement('div');
+  b.className = 'burst';
+  b.textContent = ['⭐','💜','✨','🌟','🎊'][Math.floor(Math.random()*5)];
+  b.style.cssText = `left:${rect.left+rect.width/2-12}px;top:${rect.top+window.scrollY-10}px;font-size:22px;position:fixed;pointer-events:none;z-index:999;animation:burstAnim 0.8s ease forwards`;
+  document.body.appendChild(b);
+  setTimeout(() => b.remove(), 850);
+}
+
+function resetTrace() {
+  const area = document.getElementById('traceArea');
+  // Remove old listeners by replacing element
+  const newArea = area.cloneNode(false);
+  area.parentNode.replaceChild(newArea, area);
+  document.getElementById('traceArea') // re-ref after replace
+  renderTraceWord();
+}
+
+function nextTraceWord() {
+  traceWordIdx = (traceWordIdx + 1) % TRACE_WORDS.length;
+  const area = document.getElementById('traceArea');
+  const newArea = area.cloneNode(false);
+  area.parentNode.replaceChild(newArea, area);
+  renderTraceWord();
 }
 
 // ══ TRACKER ══
