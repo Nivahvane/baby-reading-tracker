@@ -154,6 +154,43 @@
   .trace-letter.traced .trace-sub { color:var(--plum); }
   .trace-status { text-align:center; font-family:'Fredoka One',cursive; font-size:16px; color:var(--plum); min-height:28px; padding:4px 0; }
   @keyframes traceGlow { 0%,100%{box-shadow:0 0 0 0 #F5C84260} 50%{box-shadow:0 0 0 14px #F5C84200} }
+
+  /* TAB HEADER */
+  .tab-header-card { background:white; border-radius:24px; padding:18px; text-align:center; box-shadow:0 4px 20px #6B3FA015; margin-bottom:16px; }
+
+  /* NUMBERS */
+  .number-display-card { background:white; border-radius:24px; padding:20px; text-align:center; box-shadow:0 6px 24px #6B3FA015; margin-bottom:14px; }
+  .big-number { font-family:'Fredoka One',cursive; font-size:80px; color:var(--plum); display:block; line-height:1; }
+  .number-word { font-family:'Fredoka One',cursive; font-size:22px; color:var(--coral); display:block; margin-top:4px; }
+  .number-sw { font-size:13px; color:var(--soft); font-weight:700; display:block; margin-top:2px; }
+  .number-objects { font-size:28px; display:block; margin-top:8px; letter-spacing:4px; word-break:break-all; }
+  .num-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; margin-top:16px; }
+  .num-grid-btn { aspect-ratio:1; border:none; border-radius:14px; font-family:'Fredoka One',cursive; font-size:20px; cursor:pointer; background:white; color:var(--plum); box-shadow:0 2px 8px #6B3FA015; transition:all 0.2s; display:flex; align-items:center; justify-content:center; }
+  .num-grid-btn.done { background:var(--plum); color:white; }
+  .num-grid-btn.current { background:var(--gold); color:var(--text); transform:scale(1.1); }
+
+  /* COLOURS */
+  .colour-question { background:white; border-radius:24px; padding:24px 16px; text-align:center; box-shadow:0 6px 24px #6B3FA015; margin-bottom:14px; }
+  .colour-prompt { font-size:56px; display:block; margin-bottom:8px; }
+  .colour-name { font-family:'Fredoka One',cursive; font-size:28px; color:var(--plum); }
+  .colour-sw { font-size:14px; color:var(--soft); font-weight:700; margin-top:4px; }
+  .colour-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-bottom:8px; }
+  .colour-btn { height:72px; border:4px solid transparent; border-radius:20px; cursor:pointer; font-family:'Fredoka One',cursive; font-size:16px; color:white; transition:all 0.2s; box-shadow:0 4px 14px #00000020; text-shadow:0 1px 3px #00000040; }
+  .colour-btn:hover { transform:scale(1.04); }
+  .colour-btn.correct-ans { border-color:var(--mint); transform:scale(1.06); box-shadow:0 6px 20px #00000030; }
+  .colour-btn.wrong-ans { opacity:0.4; transform:scale(0.96); }
+
+  /* STARS */
+  .sticker-shelf { display:flex; flex-wrap:wrap; gap:10px; background:white; border-radius:24px; padding:18px; box-shadow:0 4px 16px #6B3FA010; margin-bottom:14px; min-height:80px; align-items:center; justify-content:center; }
+  .sticker-item { font-size:40px; animation:stickerPop 0.4s ease; }
+  @keyframes stickerPop { 0%{transform:scale(0)} 70%{transform:scale(1.2)} 100%{transform:scale(1)} }
+  .star-progress-wrap { background:white; border-radius:20px; padding:16px; margin-bottom:14px; box-shadow:0 4px 16px #6B3FA010; }
+  .star-progress-label { font-size:13px; color:var(--soft); font-weight:700; margin-bottom:8px; text-align:center; }
+  .star-progress-bar-wrap { background:var(--warm); border-radius:30px; height:18px; overflow:hidden; }
+  .star-progress-fill { height:100%; background:linear-gradient(90deg,var(--gold),var(--coral)); border-radius:30px; transition:width 0.5s ease; }
+  .star-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:6px; }
+  .star-cell { aspect-ratio:1; border-radius:10px; background:white; display:flex; align-items:center; justify-content:center; font-size:18px; box-shadow:0 2px 6px #6B3FA010; }
+  .star-cell.earned { background:linear-gradient(135deg,#FFF8D0,#FDE8A0); }
 </style>
 </head>
 <body>
@@ -167,7 +204,10 @@
 
   <div class="tab-nav">
     <button class="tab-btn active" onclick="switchTab('tracker',this)">📋 Tracker</button>
-    <button class="tab-btn" onclick="switchTab('phonics',this)">🔤 Learn ABC</button>
+    <button class="tab-btn" onclick="switchTab('phonics',this)">🔤 ABC</button>
+    <button class="tab-btn" onclick="switchTab('numbers',this)">🔢 123</button>
+    <button class="tab-btn" onclick="switchTab('colours',this)">🎨 Colours</button>
+    <button class="tab-btn" onclick="switchTab('stars',this)">⭐ Stars</button>
   </div>
 
   <!-- ══ TRACKER TAB ══ -->
@@ -257,6 +297,73 @@
     </div>
 
   </div>
+
+  <!-- ══ NUMBERS TAB ══ -->
+  <div id="numbersTab" style="display:none">
+    <div class="tab-header-card">
+      <span style="font-size:40px">🔢</span>
+      <h2 style="font-family:'Fredoka One',cursive;color:var(--plum);font-size:22px;margin-top:6px">Count &amp; Trace</h2>
+      <p style="font-size:13px;color:var(--soft);font-weight:600">Slide your finger across the number!</p>
+    </div>
+    <div class="score-strip">
+      <div class="score-card"><div class="s-num" id="numCorrect">0</div><div class="s-label">Correct ✅</div></div>
+      <div class="score-card"><div class="s-num" id="numStars">0</div><div class="s-label">Stars ⭐</div></div>
+      <div class="score-card"><div class="s-num">10</div><div class="s-label">Total</div></div>
+    </div>
+    <div id="numberDisplay" class="number-display-card"></div>
+    <div class="trace-area" id="numTraceArea"></div>
+    <div class="trace-status" id="numStatus">Touch the number to start! 👆</div>
+    <div style="display:flex;gap:10px;margin-top:16px">
+      <button class="next-word-btn" style="flex:1;margin:0" onclick="resetNumber()">🔄 Again</button>
+      <button class="next-word-btn" style="flex:1;margin:0;background:var(--coral)" onclick="nextNumber()">Next ›</button>
+    </div>
+    <div class="num-grid" id="numGrid"></div>
+  </div>
+
+  <!-- ══ COLOURS TAB ══ -->
+  <div id="coloursTab" style="display:none">
+    <div class="tab-header-card">
+      <span style="font-size:40px">🎨</span>
+      <h2 style="font-family:'Fredoka One',cursive;color:var(--plum);font-size:22px;margin-top:6px">Colours!</h2>
+      <p style="font-size:13px;color:var(--soft);font-weight:600">Tap the correct colour when you hear it!</p>
+    </div>
+    <div class="score-strip">
+      <div class="score-card"><div class="s-num" id="colCorrect">0</div><div class="s-label">Correct ✅</div></div>
+      <div class="score-card"><div class="s-num" id="colStreak">0</div><div class="s-label">Streak 🔥</div></div>
+      <div class="score-card"><div class="s-num">10</div><div class="s-label">Colours</div></div>
+    </div>
+    <div class="colour-question" id="colourQuestion">
+      <div class="colour-prompt" id="colourPrompt">🎨</div>
+      <div class="colour-name" id="colourName">Tap a colour!</div>
+      <div class="colour-sw" id="colourSw"></div>
+    </div>
+    <div class="colour-grid" id="colourGrid"></div>
+    <button class="next-word-btn" onclick="nextColour()" style="margin-top:8px">Next Colour ›</button>
+  </div>
+
+  <!-- ══ STARS TAB ══ -->
+  <div id="starsTab" style="display:none">
+    <div class="tab-header-card">
+      <span style="font-size:40px">⭐</span>
+      <h2 style="font-family:'Fredoka One',cursive;color:var(--plum);font-size:22px;margin-top:6px">My Star Chart</h2>
+      <p style="font-size:13px;color:var(--soft);font-weight:600">Earn a sticker every 5 correct answers!</p>
+    </div>
+    <div class="score-strip">
+      <div class="score-card"><div class="s-num" id="totalStarsDisp">0</div><div class="s-label">Total Stars</div></div>
+      <div class="score-card"><div class="s-num" id="totalStickersDisp">0</div><div class="s-label">Stickers 🏅</div></div>
+      <div class="score-card"><div class="s-num" id="nextStickerDisp">5</div><div class="s-label">To Next</div></div>
+    </div>
+    <div class="sticker-shelf" id="stickerShelf"></div>
+    <div class="star-progress-wrap">
+      <div class="star-progress-label" id="starProgressLabel">0 / 5 to next sticker</div>
+      <div class="star-progress-bar-wrap">
+        <div class="star-progress-fill" id="starProgressFill" style="width:0%"></div>
+      </div>
+    </div>
+    <div class="star-grid" id="starGrid"></div>
+    <button class="next-word-btn" style="background:#E8E0F0;color:var(--soft);margin-top:8px" onclick="resetAllStars()">🗑️ Reset Stars</button>
+  </div>
+
 </div>
 
 <!-- Celebration -->
@@ -331,6 +438,12 @@ function switchTab(tab, btn) {
   btn.classList.add('active');
   document.getElementById('trackerTab').style.display = tab === 'tracker' ? 'block' : 'none';
   document.getElementById('phonicsTab').style.display = tab === 'phonics' ? 'block' : 'none';
+  document.getElementById('numbersTab').style.display = tab === 'numbers' ? 'block' : 'none';
+  document.getElementById('coloursTab').style.display = tab === 'colours' ? 'block' : 'none';
+  document.getElementById('starsTab').style.display = tab === 'stars' ? 'block' : 'none';
+  if (tab === 'numbers') renderNumber();
+  if (tab === 'colours') renderColour();
+  if (tab === 'stars') renderStarsTab();
 }
 
 function switchMode(mode, btn) {
@@ -800,6 +913,199 @@ function changeWeek(dir) {
 }
 
 // ══ INIT ══
+
+// ══ NUMBERS ══
+const NUMBERS = [
+  {n:1,  word:'One',   sw:'Moja',    emoji:'🍎', obj:'🍎'},
+  {n:2,  word:'Two',   sw:'Mbili',   emoji:'🐕', obj:'🐕🐕'},
+  {n:3,  word:'Three', sw:'Tatu',    emoji:'⭐', obj:'⭐⭐⭐'},
+  {n:4,  word:'Four',  sw:'Nne',     emoji:'🌸', obj:'🌸🌸🌸🌸'},
+  {n:5,  word:'Five',  sw:'Tano',    emoji:'🐟', obj:'🐟🐟🐟🐟🐟'},
+  {n:6,  word:'Six',   sw:'Sita',    emoji:'🥚', obj:'🥚🥚🥚🥚🥚🥚'},
+  {n:7,  word:'Seven', sw:'Saba',    emoji:'🌈', obj:'🌈🌈🌈🌈🌈🌈🌈'},
+  {n:8,  word:'Eight', sw:'Nane',    emoji:'🍊', obj:'🍊🍊🍊🍊🍊🍊🍊🍊'},
+  {n:9,  word:'Nine',  sw:'Tisa',    emoji:'🐝', obj:'🐝🐝🐝🐝🐝🐝🐝🐝🐝'},
+  {n:10, word:'Ten',   sw:'Kumi',    emoji:'🎈', obj:'🎈🎈🎈🎈🎈🎈🎈🎈🎈🎈'},
+];
+
+let currentNumIdx = 0;
+let numCorrectCount = 0;
+let numDone = [];
+
+function renderNumber() {
+  const d = NUMBERS[currentNumIdx];
+  document.getElementById('numberDisplay').innerHTML = `
+    <span class="big-number">${d.n}</span>
+    <span class="number-word">${d.word}</span>
+    <span class="number-sw">${d.sw} 🇰🇪</span>
+    <span class="number-objects">${d.obj}</span>
+  `;
+  document.getElementById('numStatus').textContent = '👆 Slide your finger across the number!';
+
+  // Build trace area with digit strokes
+  const area = document.getElementById('numTraceArea');
+  area.innerHTML = d.n.toString().split('').map((ch, i) =>
+    `<div class="trace-letter" id="ntl${i}" data-idx="${i}">${ch}<span class="trace-sub">${d.sw}</span></div>`
+  ).join('');
+
+  const first = document.getElementById('ntl0');
+  if (first) first.classList.add('active');
+
+  speak(`${d.n}. ${d.word}. ${d.sw}.`);
+
+  area.onpointerdown = area.onpointermove = (e) => {
+    if (e.type === 'pointermove' && e.buttons === 0) return;
+    e.preventDefault();
+    const el = document.elementFromPoint(e.clientX, e.clientY);
+    if (el && el.classList.contains('trace-letter') && el.classList.contains('active')) {
+      el.classList.remove('active');
+      el.classList.add('traced');
+      spawnBurstAt(el);
+      playTone(true);
+      speak(d.word + '. ' + d.sw);
+      document.getElementById('numStatus').textContent = `🎉 ${d.n} — ${d.word} — ${d.sw}!`;
+      numCorrectCount++;
+      if (!numDone.includes(currentNumIdx)) { numDone.push(currentNumIdx); }
+      document.getElementById('numCorrect').textContent = numCorrectCount;
+      addStar();
+      renderNumGrid();
+      setTimeout(() => showCelebration('🔢', d.word + '!', d.n + ' — ' + d.sw + ' 🇰🇪'), 500);
+    }
+  };
+
+  renderNumGrid();
+}
+
+function renderNumGrid() {
+  document.getElementById('numGrid').innerHTML = NUMBERS.map((d,i) =>
+    `<button class="num-grid-btn ${numDone.includes(i)?'done':''} ${i===currentNumIdx?'current':''}"
+      onclick="jumpToNumber(${i})">${d.n}</button>`
+  ).join('');
+}
+
+function jumpToNumber(i) { currentNumIdx = i; renderNumber(); }
+function resetNumber() { renderNumber(); }
+function nextNumber() { currentNumIdx = (currentNumIdx+1) % 10; renderNumber(); }
+
+// ══ COLOURS ══
+const COLOURS = [
+  {name:'Red',    sw:'Nyekundu', hex:'#E53935', emoji:'🍎'},
+  {name:'Blue',   sw:'Bluu',     hex:'#1E88E5', emoji:'🫐'},
+  {name:'Yellow', sw:'Njano',    hex:'#FDD835', emoji:'🌻'},
+  {name:'Green',  sw:'Kijani',   hex:'#43A047', emoji:'🌿'},
+  {name:'Orange', sw:'Rangi ya Chungwa', hex:'#FB8C00', emoji:'🍊'},
+  {name:'Purple', sw:'Zambarau', hex:'#8E24AA', emoji:'🍇'},
+  {name:'Pink',   sw:'Pinki',    hex:'#E91E8C', emoji:'🌸'},
+  {name:'White',  sw:'Nyeupe',   hex:'#F5F5F5', emoji:'☁️'},
+  {name:'Black',  sw:'Nyeusi',   hex:'#212121', emoji:'🖤'},
+  {name:'Brown',  sw:'Kahawia',  hex:'#795548', emoji:'🐻'},
+];
+
+let currentColourIdx = 0;
+let colCorrectCount = 0;
+let colStreakCount = 0;
+
+function renderColour() {
+  const correct = COLOURS[currentColourIdx];
+  document.getElementById('colourPrompt').textContent = correct.emoji;
+  document.getElementById('colourName').textContent = correct.name;
+  document.getElementById('colourSw').textContent = correct.sw + ' 🇰🇪';
+  speak(correct.name + '. ' + correct.sw);
+
+  // Pick 3 wrong colours
+  let options = [correct];
+  let pool = COLOURS.filter((_,i) => i !== currentColourIdx);
+  pool.sort(() => Math.random()-0.5);
+  options = [...options, ...pool.slice(0,3)].sort(() => Math.random()-0.5);
+
+  document.getElementById('colourGrid').innerHTML = options.map(c => `
+    <button class="colour-btn" style="background:${c.hex}"
+      onclick="checkColour('${c.name}', this)">${c.name}</button>
+  `).join('');
+}
+
+function checkColour(name, btn) {
+  const correct = COLOURS[currentColourIdx];
+  if (name === correct.name) {
+    btn.classList.add('correct-ans');
+    document.querySelectorAll('.colour-btn').forEach(b => { if(b!==btn) b.classList.add('wrong-ans'); });
+    colCorrectCount++;
+    colStreakCount++;
+    document.getElementById('colCorrect').textContent = colCorrectCount;
+    document.getElementById('colStreak').textContent = colStreakCount;
+    addStar();
+    playTone(true);
+    speak('Correct! ' + correct.name + '! ' + correct.sw);
+    setTimeout(() => showCelebration('🎨', correct.name+'!', correct.sw + ' 🇰🇪'), 500);
+  } else {
+    btn.classList.add('wrong-ans');
+    colStreakCount = 0;
+    document.getElementById('colStreak').textContent = 0;
+    playTone(false);
+    speak('Try again! ' + correct.name);
+  }
+}
+
+function nextColour() {
+  currentColourIdx = (currentColourIdx+1) % COLOURS.length;
+  renderColour();
+}
+
+// ══ STARS & STICKERS ══
+const STICKERS = ['🏅','🌟','🎖️','👑','🏆','🎊','💜','🦁','🐯','🦋','🌈','🎉'];
+let totalStars = parseInt(localStorage.getItem('totalStars')||'0');
+let totalStickers = parseInt(localStorage.getItem('totalStickers')||'0');
+let earnedStickers = JSON.parse(localStorage.getItem('earnedStickers')||'[]');
+
+function addStar() {
+  totalStars++;
+  localStorage.setItem('totalStars', totalStars);
+  // Every 5 stars = 1 sticker
+  const expectedStickers = Math.floor(totalStars / 5);
+  if (expectedStickers > totalStickers) {
+    totalStickers = expectedStickers;
+    localStorage.setItem('totalStickers', totalStickers);
+    const sticker = STICKERS[Math.floor(Math.random()*STICKERS.length)];
+    earnedStickers.push(sticker);
+    localStorage.setItem('earnedStickers', JSON.stringify(earnedStickers));
+    setTimeout(() => showCelebration('🏅','You earned a sticker!','Keep going — you are amazing! 💜'), 1200);
+  }
+  updateScores();
+}
+
+function renderStarsTab() {
+  document.getElementById('totalStarsDisp').textContent = totalStars;
+  document.getElementById('totalStickersDisp').textContent = totalStickers;
+  const toNext = 5 - (totalStars % 5);
+  document.getElementById('nextStickerDisp').textContent = toNext === 5 ? 0 : toNext;
+  document.getElementById('starProgressLabel').textContent = (totalStars%5) + ' / 5 to next sticker';
+  document.getElementById('starProgressFill').style.width = ((totalStars%5)/5*100)+'%';
+
+  // Sticker shelf
+  const shelf = document.getElementById('stickerShelf');
+  if (earnedStickers.length === 0) {
+    shelf.innerHTML = '<p style="color:var(--soft);font-size:13px;font-weight:600">No stickers yet — keep learning! 🌟</p>';
+  } else {
+    shelf.innerHTML = earnedStickers.map(s => `<span class="sticker-item">${s}</span>`).join('');
+  }
+
+  // Star grid — show 35 stars
+  const starHTML = [];
+  for (let i = 0; i < 35; i++) {
+    starHTML.push(`<div class="star-cell ${i<totalStars?'earned':''}">${i<totalStars?'⭐':''}</div>`);
+  }
+  document.getElementById('starGrid').innerHTML = starHTML.join('');
+}
+
+function resetAllStars() {
+  if (!confirm('Reset all stars and stickers?')) return;
+  totalStars = 0; totalStickers = 0; earnedStickers = [];
+  localStorage.setItem('totalStars','0');
+  localStorage.setItem('totalStickers','0');
+  localStorage.setItem('earnedStickers','[]');
+  renderStarsTab();
+}
+
 if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(()=>{}));
 
 const initDates = getWeekDates(0);
