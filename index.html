@@ -191,6 +191,25 @@
   .star-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:6px; }
   .star-cell { aspect-ratio:1; border-radius:10px; background:white; display:flex; align-items:center; justify-content:center; font-size:18px; box-shadow:0 2px 6px #6B3FA010; }
   .star-cell.earned { background:linear-gradient(135deg,#FFF8D0,#FDE8A0); }
+
+  /* PROGRESS TAB */
+  .progress-bar-child { height:100%; border-radius:4px; transition:height 0.4s ease; }
+  .bar-col { display:flex; flex-direction:column; align-items:center; justify-content:flex-end; flex:1; }
+  .bar-val { font-size:10px; font-weight:700; color:var(--plum); margin-bottom:2px; }
+  .summary-row { display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid #F0E8F8; }
+  .summary-row:last-child { border-bottom:none; }
+  .summary-icon { font-size:24px; }
+  .summary-label { font-size:13px; font-weight:700; color:var(--text); flex:1; }
+  .summary-val { font-family:'Fredoka One',cursive; font-size:18px; color:var(--plum); }
+  .growth-week { display:flex; align-items:center; gap:8px; padding:6px 0; border-bottom:1px solid #F0E8F8; }
+  .growth-week:last-child { border-bottom:none; }
+  .growth-week-label { font-size:12px; font-weight:700; color:var(--soft); width:60px; }
+  .growth-bar { flex:1; height:12px; background:var(--warm); border-radius:30px; overflow:hidden; }
+  .growth-fill { height:100%; background:linear-gradient(90deg,var(--soft-plum),var(--coral)); border-radius:30px; transition:width 0.5s ease; }
+  .growth-num { font-size:12px; font-weight:700; color:var(--plum); width:24px; text-align:right; }
+  .note-card { background:var(--cream); border-radius:12px; padding:10px 12px; margin-bottom:8px; border-left:3px solid var(--soft-plum); }
+  .note-date { font-size:10px; color:var(--soft); font-weight:700; margin-bottom:4px; }
+  .note-text { font-size:13px; color:var(--text); font-weight:600; line-height:1.4; }
 </style>
 </head>
 <body>
@@ -202,12 +221,13 @@
     <p>My Heart Beats · Reading Journey</p>
   </div>
 
-  <div class="tab-nav">
-    <button class="tab-btn active" onclick="switchTab('tracker',this)">📋 Tracker</button>
-    <button class="tab-btn" onclick="switchTab('phonics',this)">🔤 ABC</button>
-    <button class="tab-btn" onclick="switchTab('numbers',this)">🔢 123</button>
-    <button class="tab-btn" onclick="switchTab('colours',this)">🎨 Colours</button>
-    <button class="tab-btn" onclick="switchTab('stars',this)">⭐ Stars</button>
+  <div class="tab-nav" style="flex-wrap:wrap;gap:4px">
+    <button class="tab-btn active" onclick="switchTab('tracker',this)" style="flex:1 1 auto;min-width:60px">📋<br><small>Track</small></button>
+    <button class="tab-btn" onclick="switchTab('phonics',this)" style="flex:1 1 auto;min-width:60px">🔤<br><small>ABC</small></button>
+    <button class="tab-btn" onclick="switchTab('numbers',this)" style="flex:1 1 auto;min-width:60px">🔢<br><small>123</small></button>
+    <button class="tab-btn" onclick="switchTab('colours',this)" style="flex:1 1 auto;min-width:60px">🎨<br><small>Colours</small></button>
+    <button class="tab-btn" onclick="switchTab('stars',this)" style="flex:1 1 auto;min-width:60px">⭐<br><small>Stars</small></button>
+    <button class="tab-btn" onclick="switchTab('progress',this)" style="flex:1 1 auto;min-width:60px">📊<br><small>Progress</small></button>
   </div>
 
   <!-- ══ TRACKER TAB ══ -->
@@ -366,6 +386,61 @@
 
 </div>
 
+
+  <!-- ══ PROGRESS TAB ══ -->
+  <div id="progressTab" style="display:none">
+
+    <div class="tab-header-card">
+      <span style="font-size:40px">📊</span>
+      <h2 style="font-family:'Fredoka One',cursive;color:var(--plum);font-size:22px;margin-top:6px">Progress Report</h2>
+      <p style="font-size:13px;color:var(--soft);font-weight:600">Tracking each child separately</p>
+    </div>
+
+    <!-- Child selector -->
+    <div class="mode-toggle" style="margin-bottom:16px">
+      <button class="mode-btn active" id="childBtn0" onclick="switchChild(0,this)">👶 Baby<br><small style="font-size:10px;font-family:Nunito,sans-serif">1 year old</small></button>
+      <button class="mode-btn" id="childBtn1" onclick="switchChild(1,this)">🧒 Toddler<br><small style="font-size:10px;font-family:Nunito,sans-serif">4 year old</small></button>
+    </div>
+
+    <!-- Stats cards -->
+    <div class="score-strip" id="progStats"></div>
+
+    <!-- Weekly reading chart -->
+    <div class="progress-section" style="margin-bottom:14px">
+      <h3 style="font-family:'Fredoka One',cursive;font-size:16px;color:var(--plum);margin-bottom:12px;display:flex;align-items:center;gap:6px">📅 This Week's Reading</h3>
+      <div id="weeklyChart" style="display:flex;gap:6px;align-items:flex-end;height:80px;margin-bottom:8px"></div>
+      <div id="weeklyLabels" style="display:flex;gap:6px;justify-content:space-around;font-size:10px;color:var(--soft);font-weight:700"></div>
+    </div>
+
+    <!-- Learning summary -->
+    <div style="background:white;border-radius:20px;padding:16px;box-shadow:0 4px 16px #6B3FA010;margin-bottom:14px">
+      <h3 style="font-family:'Fredoka One',cursive;font-size:16px;color:var(--plum);margin-bottom:12px">🎯 Learning Summary</h3>
+      <div id="learningSummary"></div>
+    </div>
+
+    <!-- Growth chart -->
+    <div style="background:white;border-radius:20px;padding:16px;box-shadow:0 4px 16px #6B3FA010;margin-bottom:14px">
+      <h3 style="font-family:'Fredoka One',cursive;font-size:16px;color:var(--plum);margin-bottom:12px">📈 Growth Chart</h3>
+      <div id="growthChart"></div>
+    </div>
+
+    <!-- Notes per child -->
+    <div style="background:white;border-radius:20px;padding:16px;box-shadow:0 4px 16px #6B3FA010;margin-bottom:14px">
+      <h3 style="font-family:'Fredoka One',cursive;font-size:16px;color:var(--plum);margin-bottom:10px">📝 Mama's Notes</h3>
+      <textarea id="childNotes" rows="4" placeholder="Write a note about how your child is doing today... 🥰"
+        style="width:100%;border:2px solid #E8E0F0;border-radius:12px;padding:10px 12px;font-family:Nunito,sans-serif;font-size:13px;resize:none;outline:none;background:var(--cream);color:var(--text)"
+        onchange="saveChildNote(this.value)"></textarea>
+      <button onclick="saveChildNote(document.getElementById('childNotes').value)"
+        style="margin-top:8px;background:var(--plum);color:white;border:none;border-radius:12px;padding:10px 20px;font-family:'Fredoka One',cursive;font-size:14px;cursor:pointer;width:100%">
+        💾 Save Note
+      </button>
+    </div>
+
+    <!-- Past notes -->
+    <div id="pastNotes" style="background:white;border-radius:20px;padding:16px;box-shadow:0 4px 16px #6B3FA010"></div>
+
+  </div>
+
 <!-- Celebration -->
 <div class="celebration-overlay" id="celebOverlay">
   <div class="celebration-box">
@@ -444,6 +519,8 @@ function switchTab(tab, btn) {
   if (tab === 'numbers') renderNumber();
   if (tab === 'colours') renderColour();
   if (tab === 'stars') renderStarsTab();
+  if (tab === 'progress') renderProgress();
+  document.getElementById('progressTab').style.display = tab === 'progress' ? 'block' : 'none';
 }
 
 function switchMode(mode, btn) {
@@ -480,8 +557,27 @@ function speak(text) {
   if (!window.speechSynthesis) return;
   window.speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(text);
-  u.rate = 0.8; u.pitch = 1.3;
+  u.rate = 0.85;
+  u.pitch = 1.1;
+  u.volume = 1;
+  // Pick best American English voice
+  const voices = window.speechSynthesis.getVoices();
+  const preferred = ['Samantha','Karen','Zoe','Google US English','Microsoft Aria','en-US'];
+  let chosen = null;
+  for (const p of preferred) {
+    chosen = voices.find(v => v.name.includes(p) || v.lang === p);
+    if (chosen) break;
+  }
+  if (!chosen) chosen = voices.find(v => v.lang === 'en-US') || voices.find(v => v.lang.startsWith('en'));
+  if (chosen) u.voice = chosen;
+  u.lang = 'en-US';
   window.speechSynthesis.speak(u);
+}
+
+// Pre-load voices
+if (window.speechSynthesis) {
+  window.speechSynthesis.getVoices();
+  window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
 }
 
 function nextLetter() {
@@ -1104,6 +1200,119 @@ function resetAllStars() {
   localStorage.setItem('totalStickers','0');
   localStorage.setItem('earnedStickers','[]');
   renderStarsTab();
+}
+
+
+// ══ PROGRESS TAB ══
+let selectedChild = 0; // 0=baby, 1=toddler
+const CHILD_NAMES = ['Baby (1yr)', 'Toddler (4yrs)'];
+const CHILD_KEYS = ['baby', 'toddler'];
+
+function switchChild(idx, btn) {
+  selectedChild = idx;
+  document.querySelectorAll('#childBtn0,#childBtn1').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderProgress();
+}
+
+function saveChildNote(val) {
+  if (!val.trim()) return;
+  const key = 'childNotes_' + CHILD_KEYS[selectedChild];
+  const notes = JSON.parse(localStorage.getItem(key) || '[]');
+  const today = new Date().toLocaleDateString('en-CA', {month:'short',day:'numeric',year:'numeric'});
+  // Avoid duplicate on same day
+  if (notes.length && notes[0].date === today) notes[0].text = val;
+  else notes.unshift({date:today, text:val});
+  localStorage.setItem(key, JSON.stringify(notes.slice(0,20)));
+  renderProgress();
+}
+
+function renderProgress() {
+  const childKey = CHILD_KEYS[selectedChild];
+  const childName = CHILD_NAMES[selectedChild];
+
+  // ── Stats ──
+  const weekDates = getWeekDates(0);
+  let weekSessions = 0;
+  weekDates.forEach(d => {
+    const dk = dateKey(d);
+    const sessions = readingData[dk]?.sessions || {};
+    weekSessions += SESSIONS.filter(s => sessions[s.key]).length;
+  });
+
+  const ll = selectedChild === 0 ? 0 : learnedLetters.length;
+  const tc = selectedChild === 0 ? 0 : totalCorrect;
+
+  document.getElementById('progStats').innerHTML = `
+    <div class="score-card"><div class="s-num">${weekSessions}</div><div class="s-label">Sessions 📖</div></div>
+    <div class="score-card"><div class="s-num">${ll}</div><div class="s-label">Letters 🔤</div></div>
+    <div class="score-card"><div class="s-num">${tc}</div><div class="s-label">Correct ✅</div></div>
+  `;
+
+  // ── Weekly bar chart ──
+  const days = ['S','M','T','W','T','F','S'];
+  const barHTML = weekDates.map((d,i) => {
+    const dk = dateKey(d);
+    const sessions = readingData[dk]?.sessions || {};
+    const count = SESSIONS.filter(s => sessions[s.key]).length;
+    const h = count === 0 ? 8 : (count / 3) * 64;
+    const col = count === 3 ? 'var(--plum)' : count > 0 ? 'var(--soft-plum)' : '#E8E0F0';
+    return `<div class="bar-col"><div class="bar-val">${count||''}</div><div style="width:100%;height:${h}px;background:${col};border-radius:6px 6px 0 0;transition:height 0.4s ease"></div></div>`;
+  }).join('');
+  document.getElementById('weeklyChart').innerHTML = barHTML;
+  document.getElementById('weeklyLabels').innerHTML = days.map(d => `<span style="flex:1;text-align:center">${d}</span>`).join('');
+
+  // ── Learning summary ──
+  const summaryItems = selectedChild === 0 ? [
+    {icon:'📖', label:'Reading Sessions This Week', val: weekSessions},
+    {icon:'🌟', label:'Days with Full 3 Sessions', val: weekDates.filter(d => { const dk=dateKey(d); const s=readingData[dk]?.sessions||{}; return SESSIONS.every(x=>s[x.key]); }).length},
+    {icon:'🔥', label:'Current Streak', val: (() => { let streak=0; const today=new Date(); for(let i=0;i<30;i++){const d=new Date(today);d.setDate(today.getDate()-i);const s=readingData[dateKey(d)]?.sessions||{};if(SESSIONS.some(x=>s[x.key]))streak++;else break;} return streak; })() + ' days'},
+    {icon:'💜', label:'Total Stars Earned', val: totalStars},
+  ] : [
+    {icon:'🔤', label:'Letters Learned', val: learnedLetters.length + ' / 26'},
+    {icon:'✅', label:'Total Correct Answers', val: totalCorrect},
+    {icon:'🎨', label:'Colours Correct', val: colCorrectCount},
+    {icon:'🔢', label:'Numbers Traced', val: numDone.length + ' / 10'},
+    {icon:'💜', label:'Total Stars Earned', val: totalStars},
+  ];
+
+  document.getElementById('learningSummary').innerHTML = summaryItems.map(item => `
+    <div class="summary-row">
+      <span class="summary-icon">${item.icon}</span>
+      <span class="summary-label">${item.label}</span>
+      <span class="summary-val">${item.val}</span>
+    </div>
+  `).join('');
+
+  // ── Growth chart (last 4 weeks) ──
+  let growthHTML = '';
+  for (let w = 3; w >= 0; w--) {
+    const wDates = getWeekDates(-w);
+    const wSessions = wDates.reduce((sum,d) => {
+      const s = readingData[dateKey(d)]?.sessions||{};
+      return sum + SESSIONS.filter(x=>s[x.key]).length;
+    }, 0);
+    const label = w===0 ? 'This week' : w===1 ? 'Last week' : `${w} wks ago`;
+    const pct = Math.round((wSessions/21)*100);
+    growthHTML += `
+      <div class="growth-week">
+        <div class="growth-week-label">${label}</div>
+        <div class="growth-bar"><div class="growth-fill" style="width:${pct}%"></div></div>
+        <div class="growth-num">${wSessions}</div>
+      </div>`;
+  }
+  document.getElementById('growthChart').innerHTML = growthHTML;
+
+  // ── Notes ──
+  const notesKey = 'childNotes_' + childKey;
+  const notes = JSON.parse(localStorage.getItem(notesKey) || '[]');
+  document.getElementById('childNotes').value = notes.length && notes[0].date === new Date().toLocaleDateString('en-CA',{month:'short',day:'numeric',year:'numeric'}) ? notes[0].text : '';
+
+  const pastHTML = notes.length === 0
+    ? '<p style="font-size:13px;color:var(--soft);font-weight:600;text-align:center">No notes yet — add your first note above! 🥰</p>'
+    : `<h3 style="font-family:'Fredoka One',cursive;font-size:15px;color:var(--plum);margin-bottom:10px">📖 Past Notes</h3>` +
+      notes.map(n => `<div class="note-card"><div class="note-date">${n.date}</div><div class="note-text">${n.text}</div></div>`).join('');
+  document.getElementById('pastNotes').innerHTML = pastHTML;
 }
 
 if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(()=>{}));
