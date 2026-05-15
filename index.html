@@ -210,6 +210,29 @@
   .note-card { background:var(--cream); border-radius:12px; padding:10px 12px; margin-bottom:8px; border-left:3px solid var(--soft-plum); }
   .note-date { font-size:10px; color:var(--soft); font-weight:700; margin-bottom:4px; }
   .note-text { font-size:13px; color:var(--text); font-weight:600; line-height:1.4; }
+
+  /* FAITH TAB */
+  .faith-verse-card { background:linear-gradient(135deg,var(--plum),var(--soft-plum)); border-radius:24px; padding:22px; margin-bottom:14px; color:white; text-align:center; }
+  .faith-verse-tag { font-size:11px; font-weight:800; letter-spacing:1px; text-transform:uppercase; opacity:0.8; margin-bottom:10px; }
+  .faith-verse-text { font-family:'Fredoka One',cursive; font-size:19px; line-height:1.5; margin-bottom:8px; }
+  .faith-verse-ref { font-size:13px; font-weight:700; opacity:0.9; margin-bottom:4px; }
+  .faith-verse-sw { font-size:12px; opacity:0.7; font-style:italic; margin-bottom:12px; }
+  .faith-speak-btn { background:rgba(255,255,255,0.2); border:2px solid rgba(255,255,255,0.5); color:white; border-radius:30px; padding:8px 20px; font-family:'Fredoka One',cursive; font-size:14px; cursor:pointer; transition:all 0.2s; }
+  .faith-speak-btn:hover { background:rgba(255,255,255,0.3); }
+  .rhyme-selector { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px; }
+  .rhyme-sel-btn { padding:6px 14px; border-radius:20px; border:2px solid #E8E0F0; background:var(--cream); font-family:'Fredoka One',cursive; font-size:13px; color:var(--soft); cursor:pointer; transition:all 0.2s; }
+  .rhyme-sel-btn.active { background:var(--plum); border-color:var(--plum); color:white; }
+  .rhyme-display { font-family:'Fredoka One',cursive; font-size:15px; color:var(--text); line-height:2; text-align:center; background:var(--cream); border-radius:16px; padding:14px; margin-bottom:10px; }
+  .rhyme-word-tap { display:inline-block; padding:4px 8px; margin:2px; border-radius:8px; cursor:pointer; transition:all 0.15s; background:white; border:2px solid #E8E0F0; font-family:'Fredoka One',cursive; font-size:15px; color:var(--plum); }
+  .rhyme-word-tap.tapped { background:var(--gold); border-color:var(--gold); color:var(--text); transform:scale(1.1); }
+
+  /* MEMORY GAME */
+  .memory-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+  .mem-card { aspect-ratio:1; border-radius:16px; border:3px solid #E8E0F0; background:white; display:flex; align-items:center; justify-content:center; font-size:28px; cursor:pointer; transition:all 0.3s; box-shadow:0 3px 10px #6B3FA015; user-select:none; }
+  .mem-card.flipped { background:linear-gradient(135deg,#F0E8FF,#FDE8D0); border-color:var(--soft-plum); transform:scale(1.05); }
+  .mem-card.matched { background:linear-gradient(135deg,#E8F5EE,#D0F0E0); border-color:var(--mint); opacity:0.8; cursor:default; }
+  .mem-card.wrong { border-color:var(--coral); background:#FFF0EE; animation:shake 0.3s; }
+  .mem-card-back { font-size:24px; color:var(--plum); font-family:'Fredoka One',cursive; }
 </style>
 </head>
 <body>
@@ -222,12 +245,14 @@
   </div>
 
   <div class="tab-nav" style="flex-wrap:wrap;gap:4px">
-    <button class="tab-btn active" onclick="switchTab('tracker',this)" style="flex:1 1 auto;min-width:60px">📋<br><small>Track</small></button>
-    <button class="tab-btn" onclick="switchTab('phonics',this)" style="flex:1 1 auto;min-width:60px">🔤<br><small>ABC</small></button>
-    <button class="tab-btn" onclick="switchTab('numbers',this)" style="flex:1 1 auto;min-width:60px">🔢<br><small>123</small></button>
-    <button class="tab-btn" onclick="switchTab('colours',this)" style="flex:1 1 auto;min-width:60px">🎨<br><small>Colours</small></button>
-    <button class="tab-btn" onclick="switchTab('stars',this)" style="flex:1 1 auto;min-width:60px">⭐<br><small>Stars</small></button>
-    <button class="tab-btn" onclick="switchTab('progress',this)" style="flex:1 1 auto;min-width:60px">📊<br><small>Progress</small></button>
+    <button class="tab-btn active" onclick="switchTab('tracker',this)" style="flex:1 1 auto;min-width:52px">📋<br><small>Track</small></button>
+    <button class="tab-btn" onclick="switchTab('phonics',this)" style="flex:1 1 auto;min-width:52px">🔤<br><small>ABC</small></button>
+    <button class="tab-btn" onclick="switchTab('numbers',this)" style="flex:1 1 auto;min-width:52px">🔢<br><small>123</small></button>
+    <button class="tab-btn" onclick="switchTab('colours',this)" style="flex:1 1 auto;min-width:52px">🎨<br><small>Colours</small></button>
+    <button class="tab-btn" onclick="switchTab('stars',this)" style="flex:1 1 auto;min-width:52px">⭐<br><small>Stars</small></button>
+    <button class="tab-btn" onclick="switchTab('progress',this)" style="flex:1 1 auto;min-width:52px">📊<br><small>Progress</small></button>
+    <button class="tab-btn" onclick="switchTab('faith',this)" style="flex:1 1 auto;min-width:52px">🙏<br><small>Faith</small></button>
+    <button class="tab-btn" onclick="switchTab('games',this)" style="flex:1 1 auto;min-width:52px">🃏<br><small>Games</small></button>
   </div>
 
   <!-- ══ TRACKER TAB ══ -->
@@ -441,6 +466,63 @@
 
   </div>
 
+
+  <!-- ══ FAITH TAB ══ -->
+  <div id="faithTab" style="display:none">
+    <div class="tab-header-card">
+      <span style="font-size:40px">🙏</span>
+      <h2 style="font-family:'Fredoka One',cursive;color:var(--plum);font-size:22px;margin-top:6px">Faith Corner</h2>
+      <p style="font-size:13px;color:var(--soft);font-weight:600">Bible verses &amp; memory scriptures</p>
+    </div>
+
+    <!-- Verse of the day -->
+    <div class="faith-verse-card" id="verseCard">
+      <div class="faith-verse-tag">✨ Verse of the Day</div>
+      <div class="faith-verse-text" id="verseText"></div>
+      <div class="faith-verse-ref" id="verseRef"></div>
+      <div class="faith-verse-sw" id="verseSw"></div>
+      <button class="faith-speak-btn" onclick="speakVerse()">🔊 Read to me</button>
+    </div>
+
+    <!-- Memory verse trace -->
+    <div style="background:white;border-radius:24px;padding:18px;box-shadow:0 6px 24px #6B3FA015;margin-bottom:14px">
+      <h3 style="font-family:'Fredoka One',cursive;font-size:16px;color:var(--plum);margin-bottom:4px">✍️ Memory Verse Trace</h3>
+      <p style="font-size:12px;color:var(--soft);font-weight:600;margin-bottom:12px">Slide your finger across each word!</p>
+      <div id="memVerseDisplay" style="font-family:'Fredoka One',cursive;font-size:18px;color:var(--coral);text-align:center;margin-bottom:12px"></div>
+      <div class="trace-area" id="memVerseTrace" style="flex-wrap:wrap;gap:8px;padding:16px"></div>
+      <div class="trace-status" id="memVerseStatus">Touch the first word to start! 👆</div>
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button class="next-word-btn" style="flex:1;margin:0" onclick="resetMemVerse()">🔄 Again</button>
+        <button class="next-word-btn" style="flex:1;margin:0;background:var(--coral)" onclick="nextMemVerse()">Next ›</button>
+      </div>
+    </div>
+
+    <!-- Nursery rhyme -->
+    <div style="background:white;border-radius:24px;padding:18px;box-shadow:0 6px 24px #6B3FA015;margin-bottom:14px">
+      <h3 style="font-family:'Fredoka One',cursive;font-size:16px;color:var(--plum);margin-bottom:12px">🎵 Nursery Rhymes</h3>
+      <div class="rhyme-selector" id="rhymeSelector"></div>
+      <div class="rhyme-display" id="rhymeDisplay"></div>
+      <div class="rhyme-words" id="rhymeWords"></div>
+      <button class="next-word-btn" onclick="speakRhyme()" style="margin-top:8px">🔊 Read Rhyme</button>
+    </div>
+  </div>
+
+  <!-- ══ GAMES TAB ══ -->
+  <div id="gamesTab" style="display:none">
+    <div class="tab-header-card">
+      <span style="font-size:40px">🃏</span>
+      <h2 style="font-family:'Fredoka One',cursive;color:var(--plum);font-size:22px;margin-top:6px">Memory Match</h2>
+      <p style="font-size:13px;color:var(--soft);font-weight:600">Match the letter to its picture!</p>
+    </div>
+    <div class="score-strip">
+      <div class="score-card"><div class="s-num" id="matchScore">0</div><div class="s-label">Matched ✅</div></div>
+      <div class="score-card"><div class="s-num" id="matchMoves">0</div><div class="s-label">Moves</div></div>
+      <div class="score-card"><div class="s-num" id="matchPairs">8</div><div class="s-label">Pairs</div></div>
+    </div>
+    <div class="memory-grid" id="memoryGrid"></div>
+    <button class="next-word-btn" onclick="initGame()" style="margin-top:12px">🔄 New Game</button>
+  </div>
+
 <!-- Celebration -->
 <div class="celebration-overlay" id="celebOverlay">
   <div class="celebration-box">
@@ -511,16 +593,16 @@ let weekOffset = 0;
 function switchTab(tab, btn) {
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  document.getElementById('trackerTab').style.display = tab === 'tracker' ? 'block' : 'none';
-  document.getElementById('phonicsTab').style.display = tab === 'phonics' ? 'block' : 'none';
-  document.getElementById('numbersTab').style.display = tab === 'numbers' ? 'block' : 'none';
-  document.getElementById('coloursTab').style.display = tab === 'colours' ? 'block' : 'none';
-  document.getElementById('starsTab').style.display = tab === 'stars' ? 'block' : 'none';
+  const tabs = ['trackerTab','phonicsTab','numbersTab','coloursTab','starsTab','progressTab','faithTab','gamesTab'];
+  tabs.forEach(t => document.getElementById(t).style.display = 'none');
+  const map = {tracker:'trackerTab',phonics:'phonicsTab',numbers:'numbersTab',colours:'coloursTab',stars:'starsTab',progress:'progressTab',faith:'faithTab',games:'gamesTab'};
+  if (map[tab]) document.getElementById(map[tab]).style.display = 'block';
   if (tab === 'numbers') renderNumber();
   if (tab === 'colours') renderColour();
   if (tab === 'stars') renderStarsTab();
   if (tab === 'progress') renderProgress();
-  document.getElementById('progressTab').style.display = tab === 'progress' ? 'block' : 'none';
+  if (tab === 'faith') renderFaith();
+  if (tab === 'games') initGame();
 }
 
 function switchMode(mode, btn) {
@@ -1314,6 +1396,254 @@ function renderProgress() {
       notes.map(n => `<div class="note-card"><div class="note-date">${n.date}</div><div class="note-text">${n.text}</div></div>`).join('');
   document.getElementById('pastNotes').innerHTML = pastHTML;
 }
+
+
+// ══ FAITH TAB ══
+const VERSES = [
+  {text:'God is love.',                                     ref:'1 John 4:8',    sw:'Mungu ni upendo.'},
+  {text:'Be kind to one another.',                          ref:'Ephesians 4:32',sw:'Fulizaneni wema.'},
+  {text:'I can do all things through Christ.',             ref:'Phil 4:13',     sw:'Ninaweza kila kitu kwa Kristo.'},
+  {text:'The Lord is my shepherd.',                         ref:'Psalm 23:1',    sw:'Bwana ni mchungaji wangu.'},
+  {text:'Children are a gift from God.',                    ref:'Psalm 127:3',   sw:'Watoto ni zawadi ya Mungu.'},
+  {text:'Be strong and courageous.',                        ref:'Joshua 1:9',    sw:'Kuwa hodari na jasiri.'},
+  {text:'Trust in the Lord with all your heart.',           ref:'Proverbs 3:5',  sw:'Mtumainie Bwana kwa moyo wako wote.'},
+  {text:'Jesus loves me, this I know.',                     ref:'John 3:16',     sw:'Yesu ananipenda, hilo ninajua.'},
+  {text:'Pray without ceasing.',                            ref:'1 Thess 5:17',  sw:'Ombeni bila kukoma.'},
+  {text:'The joy of the Lord is your strength.',           ref:'Nehemiah 8:10', sw:'Furaha ya Bwana ndiyo nguvu yako.'},
+];
+
+const MEM_VERSES = [
+  {text:'God is love.',        ref:'1 John 4:8'},
+  {text:'Jesus wept.',         ref:'John 11:35'},
+  {text:'Be kind.',            ref:'Ephesians 4:32'},
+  {text:'Fear not.',           ref:'Isaiah 41:10'},
+  {text:'God is good.',        ref:'Psalm 34:8'},
+  {text:'Pray always.',        ref:'1 Thess 5:17'},
+];
+
+const RHYMES = [
+  {
+    title:'Twinkle Twinkle',
+    emoji:'⭐',
+    lines:['Twinkle twinkle little star,','How I wonder what you are,','Up above the world so high,','Like a diamond in the sky!']
+  },
+  {
+    title:'Jesus Loves Me',
+    emoji:'✝️',
+    lines:['Jesus loves me this I know,','For the Bible tells me so,','Little ones to Him belong,','They are weak but He is strong!']
+  },
+  {
+    title:'Head Shoulders',
+    emoji:'🧒',
+    lines:['Head and shoulders knees and toes,','Knees and toes!','Head and shoulders knees and toes,','Eyes and ears and mouth and nose!']
+  },
+  {
+    title:'Baa Baa',
+    emoji:'🐑',
+    lines:['Baa baa black sheep have you any wool,','Yes sir yes sir three bags full,','One for the master one for the dame,','One for the little child down the lane!']
+  },
+];
+
+let currentVerseIdx = 0;
+let currentMemVerseIdx = 0;
+let memVersePos = 0;
+let currentRhymeIdx = 0;
+
+function renderFaith() {
+  // Rotate verse of the day by date
+  const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(),0,0)) / 86400000);
+  currentVerseIdx = dayOfYear % VERSES.length;
+  const v = VERSES[currentVerseIdx];
+  document.getElementById('verseText').textContent = '"' + v.text + '"';
+  document.getElementById('verseRef').textContent = '— ' + v.ref;
+  document.getElementById('verseSw').textContent = v.sw;
+
+  renderMemVerse();
+  renderRhymeSelector();
+  renderRhyme();
+}
+
+function speakVerse() {
+  const v = VERSES[currentVerseIdx];
+  speak(v.text + '. ' + v.ref);
+}
+
+function renderMemVerse() {
+  const mv = MEM_VERSES[currentMemVerseIdx];
+  document.getElementById('memVerseDisplay').textContent = '"' + mv.text + '" — ' + mv.ref;
+  document.getElementById('memVerseStatus').textContent = '👆 Touch the first word to start!';
+  memVersePos = 0;
+
+  const words = mv.text.replace(/[.,!?]/g,'').split(' ');
+  const area = document.getElementById('memVerseTrace');
+  area.innerHTML = words.map((w,i) =>
+    `<div class="trace-letter" id="mv${i}" style="width:auto;height:auto;padding:10px 14px;font-size:20px;border-radius:14px">
+      ${w}<span class="trace-sub" style="font-size:9px">${i===0?'start':''}</span>
+    </div>`
+  ).join('');
+
+  const first = document.getElementById('mv0');
+  if (first) first.classList.add('active');
+
+  area.onpointerdown = area.onpointermove = (e) => {
+    if (e.type === 'pointermove' && e.buttons === 0) return;
+    e.preventDefault();
+    const el = document.elementFromPoint(e.clientX, e.clientY);
+    if (el && el.id === 'mv' + memVersePos && el.classList.contains('active')) {
+      el.classList.remove('active');
+      el.classList.add('traced');
+      speak(words[memVersePos]);
+      playTone(true);
+      spawnBurstAt(el);
+      memVersePos++;
+      const next = document.getElementById('mv' + memVersePos);
+      if (next) next.classList.add('active');
+      document.getElementById('memVerseStatus').textContent = memVersePos < words.length ? '👆 Keep going!' : '🎉 Well done! ' + mv.ref;
+      if (memVersePos === words.length) {
+        addStar();
+        setTimeout(() => {
+          speak(mv.text + '. ' + mv.ref);
+          showCelebration('📖', 'Scripture learned!', '"' + mv.text + '" ' + mv.ref);
+        }, 400);
+      }
+    }
+  };
+}
+
+function resetMemVerse() { renderMemVerse(); }
+function nextMemVerse() {
+  currentMemVerseIdx = (currentMemVerseIdx + 1) % MEM_VERSES.length;
+  renderMemVerse();
+}
+
+function renderRhymeSelector() {
+  document.getElementById('rhymeSelector').innerHTML = RHYMES.map((r,i) =>
+    `<button class="rhyme-sel-btn ${i===currentRhymeIdx?'active':''}" onclick="selectRhyme(${i})">${r.emoji} ${r.title}</button>`
+  ).join('');
+}
+
+function selectRhyme(i) {
+  currentRhymeIdx = i;
+  renderRhymeSelector();
+  renderRhyme();
+}
+
+function renderRhyme() {
+  const r = RHYMES[currentRhymeIdx];
+  document.getElementById('rhymeDisplay').innerHTML = r.lines.join('<br>');
+  document.getElementById('rhymeWords').innerHTML = r.lines.map(line =>
+    line.split(' ').map(w =>
+      `<span class="rhyme-word-tap" onclick="tapRhymeWord(this,'${w.replace(/[^a-zA-Z]/g,'')}')">${w}</span>`
+    ).join(' ')
+  ).join('<br>');
+}
+
+function tapRhymeWord(el, word) {
+  el.classList.toggle('tapped');
+  speak(word);
+  spawnBurstAt(el);
+  playTone(true);
+}
+
+function speakRhyme() {
+  const r = RHYMES[currentRhymeIdx];
+  speak(r.lines.join('. '));
+}
+
+// ══ MEMORY GAME ══
+const GAME_PAIRS = [
+  {letter:'A', emoji:'🍎'},
+  {letter:'B', emoji:'⚽'},
+  {letter:'C', emoji:'🐱'},
+  {letter:'D', emoji:'🐕'},
+  {letter:'G', emoji:'🐐'},
+  {letter:'S', emoji:'⭐'},
+  {letter:'M', emoji:'🌙'},
+  {letter:'F', emoji:'🐟'},
+];
+
+let gameCards = [];
+let flippedCards = [];
+let matchedPairs = 0;
+let gameMoves = 0;
+let gameScore = 0;
+let canFlip = true;
+
+function initGame() {
+  const pairs = [...GAME_PAIRS].sort(() => Math.random()-0.5).slice(0,8);
+  const cards = [];
+  pairs.forEach((p,i) => {
+    cards.push({id:i*2,   type:'letter', value:p.letter, pair:i, flipped:false, matched:false});
+    cards.push({id:i*2+1, type:'emoji',  value:p.emoji,  pair:i, flipped:false, matched:false});
+  });
+  gameCards = cards.sort(() => Math.random()-0.5);
+  flippedCards = [];
+  matchedPairs = 0;
+  gameMoves = 0;
+  gameScore = 0;
+  canFlip = true;
+  document.getElementById('matchScore').textContent = 0;
+  document.getElementById('matchMoves').textContent = 0;
+  document.getElementById('matchPairs').textContent = pairs.length;
+  renderGameBoard();
+}
+
+function renderGameBoard() {
+  document.getElementById('memoryGrid').innerHTML = gameCards.map(c => `
+    <div class="mem-card ${c.flipped||c.matched?'flipped':''} ${c.matched?'matched':''}"
+      id="gc${c.id}" onclick="flipCard(${c.id})">
+      ${c.flipped||c.matched ? c.value : '<span class="mem-card-back">?</span>'}
+    </div>
+  `).join('');
+}
+
+function flipCard(id) {
+  if (!canFlip) return;
+  const card = gameCards.find(c => c.id === id);
+  if (!card || card.flipped || card.matched) return;
+  if (flippedCards.length >= 2) return;
+
+  card.flipped = true;
+  flippedCards.push(card);
+  speak(card.value);
+  renderGameBoard();
+
+  if (flippedCards.length === 2) {
+    gameMoves++;
+    document.getElementById('matchMoves').textContent = gameMoves;
+    canFlip = false;
+
+    const [a, b] = flippedCards;
+    if (a.pair === b.pair) {
+      // Match!
+      a.matched = b.matched = true;
+      matchedPairs++;
+      gameScore++;
+      addStar();
+      document.getElementById('matchScore').textContent = gameScore;
+      playTone(true);
+      const pair = GAME_PAIRS[a.pair];
+      speak(pair.letter + ' is for ' + pair.emoji);
+      flippedCards = [];
+      canFlip = true;
+      renderGameBoard();
+      if (matchedPairs === 8) {
+        setTimeout(() => showCelebration('🏆','You won!','All pairs matched! Hongera! 🎉'), 400);
+      }
+    } else {
+      // No match
+      playTone(false);
+      setTimeout(() => {
+        a.flipped = b.flipped = false;
+        flippedCards = [];
+        canFlip = true;
+        renderGameBoard();
+      }, 900);
+    }
+  }
+}
+
+function renderGame() { initGame(); }
 
 if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(()=>{}));
 
