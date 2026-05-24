@@ -279,6 +279,7 @@ body::after{content:'';position:fixed;bottom:-80px;left:-80px;width:350px;height
   <button class="tab-btn" onclick="switchTab('progress',this)">📊<br>Progress</button>
   <button class="tab-btn" onclick="switchTab('faith',this)">🙏<br>Faith</button>
   <button class="tab-btn" onclick="switchTab('games',this)">🃏<br>Games</button>
+  <button class="tab-btn" onclick="switchTab('settings',this)">⚙️<br>Settings</button>
 </div>
 
 <!-- TRACKER -->
@@ -559,6 +560,63 @@ body::after{content:'';position:fixed;bottom:-80px;left:-80px;width:350px;height
 
 </div>
 
+
+<!-- SETTINGS TAB -->
+<div id="settingsTab" style="display:none">
+  <div class="tab-header-card">
+    <span style="font-size:36px">⚙️</span>
+    <h2 style="font-family:'Fredoka One',cursive;color:var(--plum);font-size:19px;margin-top:5px">Settings</h2>
+    <p style="font-size:12px;color:var(--soft);font-weight:600">Personalize your app</p>
+  </div>
+
+  <!-- Child names -->
+  <div style="background:white;border-radius:18px;padding:16px;box-shadow:0 4px 16px #6B3FA010;margin-bottom:12px">
+    <h3 style="font-family:'Fredoka One',cursive;font-size:15px;color:var(--plum);margin-bottom:12px">👶 Your Children's Names</h3>
+
+    <div style="margin-bottom:12px">
+      <label style="font-size:12px;font-weight:700;color:var(--soft);display:block;margin-bottom:5px">Baby (younger child)</label>
+      <input type="text" id="babyNameInput" placeholder="e.g. Divine"
+        style="width:100%;border:2px solid #E8E0F0;border-radius:10px;padding:10px 12px;font-family:'Fredoka One',cursive;font-size:16px;color:var(--plum);outline:none;background:var(--cream);"
+        oninput="previewNames()">
+    </div>
+
+    <div style="margin-bottom:14px">
+      <label style="font-size:12px;font-weight:700;color:var(--soft);display:block;margin-bottom:5px">Older child (Speech Builder)</label>
+      <input type="text" id="olderNameInput" placeholder="e.g. Dalphon"
+        style="width:100%;border:2px solid #E8E0F0;border-radius:10px;padding:10px 12px;font-family:'Fredoka One',cursive;font-size:16px;color:var(--plum);outline:none;background:var(--cream);"
+        oninput="previewNames()">
+    </div>
+
+    <div id="namePreview" style="background:var(--cream);border-radius:12px;padding:10px 14px;margin-bottom:12px;display:none">
+      <div style="font-size:12px;color:var(--soft);font-weight:700;margin-bottom:4px">Preview:</div>
+      <div id="previewText" style="font-family:'Fredoka One',cursive;font-size:14px;color:var(--plum)"></div>
+    </div>
+
+    <button onclick="saveNames()"
+      style="width:100%;background:var(--plum);color:white;border:none;border-radius:12px;padding:12px;font-family:'Fredoka One',cursive;font-size:15px;cursor:pointer;box-shadow:0 4px 12px #6B3FA040">
+      💾 Save Names
+    </button>
+  </div>
+
+  <!-- App info -->
+  <div style="background:linear-gradient(135deg,var(--plum),var(--soft-plum));border-radius:18px;padding:16px;color:white;text-align:center;margin-bottom:12px">
+    <div style="font-size:36px;margin-bottom:6px">📚</div>
+    <div style="font-family:'Fredoka One',cursive;font-size:18px;margin-bottom:4px" id="appTitleDisplay">Baby Reading Tracker</div>
+    <div style="font-size:12px;opacity:0.8;margin-bottom:10px">My Heart Beats · Reading Journey</div>
+    <div style="font-size:11px;opacity:0.7">Built with love for your family 💜</div>
+  </div>
+
+  <!-- Reset data -->
+  <div style="background:white;border-radius:18px;padding:16px;box-shadow:0 4px 16px #6B3FA010">
+    <h3 style="font-family:'Fredoka One',cursive;font-size:14px;color:var(--coral);margin-bottom:8px">⚠️ Reset Data</h3>
+    <p style="font-size:12px;color:var(--soft);font-weight:600;margin-bottom:10px">This will clear all reading logs and learning progress.</p>
+    <button onclick="resetAllData()"
+      style="width:100%;background:#FFF0EE;color:var(--coral);border:2px solid var(--coral);border-radius:12px;padding:10px;font-family:'Fredoka One',cursive;font-size:14px;cursor:pointer">
+      🗑️ Reset All Data
+    </button>
+  </div>
+</div>
+
 <!-- Celebration -->
 <div class="celebration-overlay" id="celebOverlay">
   <div class="celebration-box">
@@ -713,7 +771,7 @@ let selectedChild=0;
 function switchTab(tab,btn){
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
-  ['trackerTab','phonicsTab','numbersTab','coloursTab','dalphonTab','starsTab','progressTab','faithTab','gamesTab']
+  ['trackerTab','phonicsTab','numbersTab','coloursTab','dalphonTab','starsTab','progressTab','faithTab','gamesTab','settingsTab']
     .forEach(t=>document.getElementById(t).style.display='none');
   const map={tracker:'trackerTab',phonics:'phonicsTab',numbers:'numbersTab',colours:'coloursTab',dalphon:'dalphonTab',stars:'starsTab',progress:'progressTab',faith:'faithTab',games:'gamesTab'};
   if(map[tab])document.getElementById(map[tab]).style.display='block';
@@ -724,6 +782,8 @@ function switchTab(tab,btn){
   if(tab==='faith')renderFaith();
   if(tab==='games')initGame();
   if(tab==='dalphon')renderDalphon();
+  if(tab==='settings')renderSettings();
+  document.getElementById('settingsTab').style.display=tab==='settings'?'block':'none';
 }
 
 function switchMode(mode,btn){
@@ -1233,11 +1293,72 @@ function closeCelebration(){document.getElementById('celebOverlay').classList.re
 function launchConfetti(){const emojis=['🎉','⭐','💜','✅','🌟','🎊','📚'];for(let i=0;i<14;i++){setTimeout(()=>{const b=document.createElement('div');b.className='burst';b.textContent=emojis[Math.floor(Math.random()*emojis.length)];b.style.cssText='left:'+Math.random()*90+'vw;top:'+Math.random()*50+'vh;font-size:'+(20+Math.random()*22)+'px;position:fixed;pointer-events:none;z-index:9999;animation:burstAnim 0.9s ease forwards';document.body.appendChild(b);setTimeout(()=>b.remove(),950);},i*70);}}
 function playTone(correct){try{const ctx=new(window.AudioContext||window.webkitAudioContext)();const freqs=correct?[523,659]:[220];freqs.forEach((freq,i)=>{setTimeout(()=>{const o=ctx.createOscillator();const g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.frequency.value=freq;o.type=correct?'sine':'sawtooth';g.gain.setValueAtTime(0.3,ctx.currentTime);g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.35);o.start();o.stop(ctx.currentTime+0.35);},i*150);});}catch(e){}}
 
+
+// ══ SETTINGS & CUSTOM NAMES ══
+let childNames = JSON.parse(localStorage.getItem('childNames') || '{"baby":"Baby","older":"Dalphon"}');
+
+function loadNames() {
+  childNames = JSON.parse(localStorage.getItem('childNames') || '{"baby":"Baby","older":"Dalphon"}');
+  applyNames();
+}
+
+function applyNames() {
+  // Update Dalphon tab banner
+  const banner = document.querySelector('.dalphon-banner h3');
+  if (banner) banner.textContent = '🗣️ ' + childNames.older + "'s Corner";
+  const bannerP = document.querySelector('.dalphon-banner p');
+  if (bannerP) bannerP.textContent = 'Slow, clear, encouraging activities for ' + childNames.older + '!';
+
+  // Update progress tab child buttons
+  const btn0 = document.getElementById('childBtn0');
+  const btn1 = document.getElementById('childBtn1');
+  if (btn0) btn0.innerHTML = '👶 ' + childNames.baby + '<br><small style="font-size:9px;font-family:Nunito,sans-serif">younger</small>';
+  if (btn1) btn1.innerHTML = '🧒 ' + childNames.older + '<br><small style="font-size:9px;font-family:Nunito,sans-serif">older</small>';
+
+  // Update app title
+  const appTitle = document.getElementById('appTitleDisplay');
+  if (appTitle) appTitle.textContent = childNames.baby + ' & ' + childNames.older + "'s Reading App";
+
+  // Update header
+  const headerP = document.querySelector('.header p');
+  if (headerP) headerP.textContent = childNames.baby + ' & ' + childNames.older + ' · Reading Journey';
+}
+
+function renderSettings() {
+  document.getElementById('babyNameInput').value = childNames.baby !== 'Baby' ? childNames.baby : '';
+  document.getElementById('olderNameInput').value = childNames.older !== 'Dalphon' ? childNames.older : '';
+  applyNames();
+}
+
+function previewNames() {
+  const baby = document.getElementById('babyNameInput').value.trim() || 'Baby';
+  const older = document.getElementById('olderNameInput').value.trim() || 'Dalphon';
+  document.getElementById('namePreview').style.display = 'block';
+  document.getElementById('previewText').textContent =
+    '🗣️ ' + older + "'s Corner  |  👶 " + baby + "'s Milestones";
+}
+
+function saveNames() {
+  const baby = document.getElementById('babyNameInput').value.trim() || 'Baby';
+  const older = document.getElementById('olderNameInput').value.trim() || 'Dalphon';
+  childNames = { baby, older };
+  localStorage.setItem('childNames', JSON.stringify(childNames));
+  applyNames();
+  playTone(true);
+  showCelebration('💜', 'Names Saved!', older + ' & ' + baby + " — your app is personalized! 🎉");
+}
+
+function resetAllData() {
+  if (!confirm('Reset ALL data? This cannot be undone.')) return;
+  localStorage.clear();
+  location.reload();
+}
+
 // ══ INIT ══
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 const initDates=getWeekDates(0);
 document.getElementById('weekLabel').textContent='Week of '+formatDate(initDates[0]);
-renderDays();updateStats();renderMilestones();renderLetter();updateScores();
+loadNames();renderDays();updateStats();renderMilestones();renderLetter();updateScores();
 </script>
 </body>
 </html>
