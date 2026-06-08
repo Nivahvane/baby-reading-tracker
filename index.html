@@ -259,48 +259,55 @@ body::after{content:'';position:fixed;bottom:-80px;left:-80px;width:350px;height
 .burst{position:fixed;pointer-events:none;z-index:999;animation:burstAnim 0.8s ease forwards;}
 @keyframes burstAnim{0%{opacity:1;transform:scale(0.5) translateY(0)}100%{opacity:0;transform:scale(1.5) translateY(-60px)}}
 
-  /* SOUND SLIDER — finger slides under word */
+  /* SOUND DOTS — tap dot under each letter */
   .slider-emoji { font-size:64px; display:block; margin-bottom:10px; }
 
-  /* Big word letters */
-  .slide-word-row { display:flex; justify-content:center; gap:6px; margin-bottom:0; position:relative; }
-  .slide-letter {
-    font-family:'Fredoka One',cursive; font-size:58px; color:#C8C0D8;
-    transition:all 0.25s; line-height:1; padding:0 4px; position:relative;
+  /* Big letters */
+  .dot-letters-row { display:flex; justify-content:center; gap:0; margin-bottom:6px; }
+  .dot-letter {
+    font-family:'Fredoka One',cursive; font-size:62px; color:#C8C0D8;
+    line-height:1; width:80px; text-align:center;
+    transition:all 0.25s;
   }
-  .slide-letter .slide-sound { font-size:11px; font-weight:800; color:var(--soft-plum); display:block; text-align:center; font-family:'Nunito',sans-serif; margin-top:2px; }
-  .slide-letter.lit { color:var(--gold); transform:scale(1.2); text-shadow:0 4px 12px #F5C84260; }
-  .slide-letter.lit .slide-sound { color:var(--gold); }
-  .slide-letter.passed { color:var(--plum); transform:scale(1.05); }
-  .slide-letter.passed .slide-sound { color:var(--soft-plum); }
+  .dot-letter.active { color:var(--plum); transform:scale(1.15); text-shadow:0 4px 16px #6B3FA040; }
+  .dot-letter.done { color:var(--soft-plum); }
 
-  /* Slide zone — the touch area under the word */
-  .slide-zone {
-    margin: 10px 0 8px;
-    height: 60px;
-    background: var(--cream);
-    border-radius: 16px;
-    border: 3px dashed #E8E0F0;
-    position: relative;
-    cursor: pointer;
-    overflow: hidden;
-    touch-action: none;
-    user-select: none;
+  /* Dots row */
+  .dot-row { display:flex; justify-content:center; gap:0; margin-bottom:4px; }
+  .sound-dot {
+    width:80px; height:44px; display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
   }
-  .slide-finger-hint {
-    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-    font-family:'Fredoka One',cursive; font-size:14px; color:var(--soft); pointer-events:none;
-    transition:opacity 0.3s;
+  .sound-dot-inner {
+    width:28px; height:28px; border-radius:50%;
+    background:#D0C8E0; transition:all 0.2s;
+    box-shadow:0 2px 6px #6B3FA020;
   }
-  .slide-underline {
-    position:absolute; left:0; top:50%; transform:translateY(-50%);
-    height:8px; background:linear-gradient(90deg,var(--soft-plum),var(--coral));
-    border-radius:30px; transition:width 0.04s; pointer-events:none;
+  .sound-dot.tapped .sound-dot-inner {
+    background:var(--soft-plum);
+    transform:scale(1.2);
+    box-shadow:0 4px 12px #6B3FA050;
   }
-  .slide-zone.active { border-color:var(--gold); background:#FFFBE8; }
-  .slide-zone.active .slide-finger-hint { opacity:0; }
+  .sound-dot.current .sound-dot-inner {
+    background:var(--coral);
+    animation:dotPulse 0.8s ease infinite;
+  }
+  .sound-dot.done .sound-dot-inner { background:var(--plum); }
+  @keyframes dotPulse { 0%,100%{transform:scale(1);box-shadow:0 2px 6px #E8846A40} 50%{transform:scale(1.25);box-shadow:0 4px 16px #E8846A80} }
 
-  .slider-full-word { font-family:'Fredoka One',cursive; font-size:34px; color:var(--coral); min-height:42px; transition:all 0.4s; opacity:0; transform:scale(0.8); margin-top:6px; }
+  .dot-speaker-btn {
+    width:48px; height:48px; border-radius:50%; border:none;
+    background:var(--soft-plum); color:white; font-size:22px;
+    cursor:pointer; box-shadow:0 4px 12px #6B3FA040; transition:all 0.2s;
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+  }
+  .dot-speaker-btn:active { transform:scale(0.92); }
+
+  .slider-full-word {
+    font-family:'Fredoka One',cursive; font-size:30px; color:var(--coral);
+    min-height:36px; transition:all 0.4s; opacity:0; transform:scale(0.8);
+  }
   .slider-full-word.show { opacity:1; transform:scale(1); }
 
   .slider-status { text-align:center; font-family:'Fredoka One',cursive; font-size:15px; color:var(--plum); min-height:24px; margin-bottom:12px; padding:3px 0; }
@@ -505,32 +512,32 @@ body::after{content:'';position:fixed;bottom:-80px;left:-80px;width:350px;height
     <button class="next-word-btn" onclick="nextTrain()">Next Sentence ›</button>
   </div>
 
-  <!-- SOUND SLIDER — finger slides under word -->
+  <!-- SOUND DOTS — tap dot under each letter -->
   <div id="sliderMode" style="display:none">
 
-    <div style="background:white;border-radius:22px;padding:18px 14px 22px;box-shadow:0 8px 30px #6B3FA020;margin-bottom:14px;text-align:center">
+    <div style="background:white;border-radius:24px;padding:22px 16px 18px;box-shadow:0 8px 30px #6B3FA020;margin-bottom:14px;text-align:center">
+
+      <!-- Emoji -->
       <span class="slider-emoji" id="sliderEmoji">🐱</span>
 
-      <!-- The word with big letters -->
-      <div class="slide-word-row" id="slideWordRow"></div>
+      <!-- Big letters row -->
+      <div class="dot-letters-row" id="dotLettersRow"></div>
 
-      <!-- Finger slide zone — directly under the word -->
-      <div class="slide-zone" id="slideZone"
-        ontouchstart="slideStart(event)" ontouchmove="slideMove(event)" ontouchend="slideEnd(event)"
-        onmousedown="slideStart(event)" onmousemove="slideMove(event)" onmouseup="slideEnd(event)">
-        <div class="slide-finger-hint">👆 Slide your finger here</div>
-        <div class="slide-underline" id="slideUnderline" style="width:0%"></div>
+      <!-- Dots row — one dot per letter, tap each -->
+      <div class="dot-row" id="dotRow"></div>
+
+      <!-- Speaker button on left like Reading.com -->
+      <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-top:10px">
+        <button class="dot-speaker-btn" onclick="speakSliderWord()">🔊</button>
+        <div class="slider-full-word" id="sliderFullWord"></div>
       </div>
-
-      <!-- Full word appears when complete -->
-      <div class="slider-full-word" id="sliderFullWord"></div>
     </div>
 
-    <div class="slider-status" id="sliderStatus">Place your finger and slide slowly! 👆</div>
+    <div class="slider-status" id="sliderStatus">Tap each dot to hear the sound! 👆</div>
 
     <div class="slider-controls">
-      <button class="slider-ctrl-btn" onclick="speakSliderWord()">🔊 Hear Word</button>
-      <button class="slider-ctrl-btn" onclick="resetSlider()" style="background:var(--coral)">🔄 Reset</button>
+      <button class="slider-ctrl-btn" onclick="resetSlider()">🔄 Try Again</button>
+      <button class="slider-ctrl-btn" onclick="jumpSliderWord((currentSliderWordIdx+1)%SLIDER_WORDS.length)" style="background:var(--coral)">Next ›</button>
     </div>
 
     <div class="slider-word-grid" id="sliderWordGrid"></div>
@@ -1467,34 +1474,32 @@ const SLIDER_WORDS = [
 ];
 
 let currentSliderWordIdx = 0;
-let lastLitLetter = -1;
+let dotTapIdx = 0;
 let sliderCompleted = false;
-let slideIsActive = false;
 
 function renderSlider() {
   const w = SLIDER_WORDS[currentSliderWordIdx];
-  lastLitLetter = -1;
+  dotTapIdx = 0;
   sliderCompleted = false;
-  slideIsActive = false;
 
   document.getElementById('sliderEmoji').textContent = w.emoji;
   document.getElementById('sliderFullWord').textContent = w.word;
   document.getElementById('sliderFullWord').classList.remove('show');
-  document.getElementById('sliderStatus').textContent = '👆 Place finger and slide slowly!';
+  document.getElementById('sliderStatus').textContent = 'Tap each dot to hear the sound! 👆';
 
-  // Build big word letters directly
-  document.getElementById('slideWordRow').innerHTML = w.sounds.map((s, i) =>
-    '<div class="slide-letter" id="slb' + i + '">' + s +
-    '<span class="slide-sound">' + w.phonics[i] + '</span></div>'
+  // Build letters row
+  document.getElementById('dotLettersRow').innerHTML = w.sounds.map((s, i) =>
+    '<div class="dot-letter" id="dltr' + i + '">' + s + '</div>'
   ).join('');
 
-  // Reset slide zone
-  const zone = document.getElementById('slideZone');
-  zone.classList.remove('active');
-  document.getElementById('slideUnderline').style.width = '0%';
+  // Build dots row — only first dot is active (red/pulsing)
+  document.getElementById('dotRow').innerHTML = w.sounds.map((s, i) =>
+    '<div class="sound-dot ' + (i === 0 ? 'current' : '') + '" id="dot' + i + '" onclick="tapDot(' + i + ')">' +
+    '<div class="sound-dot-inner"></div></div>'
+  ).join('');
 
-  // Speak the word gently first
-  setTimeout(() => speak(w.word, true, false), 500);
+  // Speak word gently
+  setTimeout(() => speak(w.word, true, false), 400);
 
   // Word grid
   document.getElementById('sliderWordGrid').innerHTML = SLIDER_WORDS.map((sw, i) =>
@@ -1504,112 +1509,80 @@ function renderSlider() {
   ).join('');
 }
 
-function slideStart(e) {
-  e.preventDefault();
-  slideIsActive = true;
-  document.getElementById('slideZone').classList.add('active');
-  slideMove(e);
-}
-
-function slideMove(e) {
-  if (!slideIsActive) return;
-  e.preventDefault();
+function tapDot(idx) {
   const w = SLIDER_WORDS[currentSliderWordIdx];
-  const zone = document.getElementById('slideZone');
-  const rect = zone.getBoundingClientRect();
-  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-  const relX = clientX - rect.left;
-  const pct = Math.max(0, Math.min(100, (relX / rect.width) * 100));
 
-  // Update underline
-  document.getElementById('slideUnderline').style.width = pct + '%';
-
-  // Which letter zone are we in?
-  const numLetters = w.sounds.length;
-  const letterIdx = Math.min(Math.floor(pct / (100 / numLetters)), numLetters - 1);
-
-  if (pct < 2) {
-    // Reset
-    for (let i = 0; i < numLetters; i++) {
-      const el = document.getElementById('slb' + i);
-      if (el) el.classList.remove('lit', 'passed');
-    }
-    lastLitLetter = -1;
-    document.getElementById('sliderFullWord').classList.remove('show');
-    document.getElementById('sliderStatus').textContent = '👆 Keep sliding!';
+  // Only allow tapping the current dot in sequence
+  if (idx !== dotTapIdx) {
+    // Wrong order — hint
+    document.getElementById('sliderStatus').textContent = '👆 Tap the red dot first!';
+    playTone(false);
     return;
   }
 
-  // Light up letters
-  for (let i = 0; i < numLetters; i++) {
-    const el = document.getElementById('slb' + i);
-    if (!el) continue;
-    if (i < letterIdx) { el.classList.remove('lit'); el.classList.add('passed'); }
-    else if (i === letterIdx) { el.classList.add('lit'); el.classList.remove('passed'); }
-    else { el.classList.remove('lit', 'passed'); }
-  }
+  // Mark dot as tapped
+  const dot = document.getElementById('dot' + idx);
+  dot.classList.remove('current');
+  dot.classList.add('tapped', 'done');
 
-  // Speak when entering a new letter
-  if (letterIdx !== lastLitLetter) {
-    lastLitLetter = letterIdx;
-    speak(w.phonics[letterIdx], true, true);
-    document.getElementById('sliderStatus').textContent =
-      '"' + w.sounds[letterIdx] + '"  ···  ' + w.phonics[letterIdx];
-    const el = document.getElementById('slb' + letterIdx);
-    if (el) spawnBurstAt(el);
-    playTone(true);
-  }
+  // Light up the letter
+  const letter = document.getElementById('dltr' + idx);
+  letter.classList.add('active');
 
-  // Word complete!
-  if (pct >= 94 && !sliderCompleted) {
-    sliderCompleted = true;
-    for (let i = 0; i < numLetters; i++) {
-      const el = document.getElementById('slb' + i);
-      if (el) { el.classList.remove('lit'); el.classList.add('passed'); }
-    }
-    const fullWordEl = document.getElementById('sliderFullWord');
-    fullWordEl.classList.add('show');
-    document.getElementById('sliderStatus').textContent = '🎉 ' + w.word + '!  Well done!';
+  // Speak the sound — very slow
+  speak(w.phonics[idx], true, true);
+  playTone(true);
+  spawnBurstAt(letter);
+
+  document.getElementById('sliderStatus').textContent =
+    '"' + w.sounds[idx] + '"  says  ' + w.phonics[idx];
+
+  dotTapIdx++;
+
+  // Move red dot to next
+  if (dotTapIdx < w.sounds.length) {
     setTimeout(() => {
-      speak(w.word, false, false);
+      const nextDot = document.getElementById('dot' + dotTapIdx);
+      if (nextDot) nextDot.classList.add('current');
+    }, 300);
+  }
+
+  // All dots tapped — blend the word!
+  if (dotTapIdx === w.sounds.length) {
+    sliderCompleted = true;
+
+    // Mark all letters as done
+    setTimeout(() => {
+      for (let i = 0; i < w.sounds.length; i++) {
+        const l = document.getElementById('dltr' + i);
+        if (l) { l.classList.remove('active'); l.classList.add('done'); }
+      }
+      // Show full word
+      document.getElementById('sliderFullWord').classList.add('show');
+      document.getElementById('sliderStatus').textContent = '🎉 ' + w.word + '!  You read it!';
+
+      // Speak slowly then fast
+      speak(w.sounds.join('... '), true, true);
+      setTimeout(() => speak(w.word, false, false), 1200);
+
       addStar();
       launchConfetti();
-      setTimeout(() => showCelebration('🎚️', w.word + '!', 'You read it! Amazing job!'), 700);
-    }, 200);
-  }
-}
-
-function slideEnd(e) {
-  slideIsActive = false;
-  const zone = document.getElementById('slideZone');
-  if (!sliderCompleted) {
-    zone.classList.remove('active');
-    const w = SLIDER_WORDS[currentSliderWordIdx];
-    speak(w.word, true, false);
+      setTimeout(() => showCelebration('🎚️', w.word + '!', 'You read every sound! Amazing!'), 900);
+    }, 400);
   }
 }
 
 function speakSliderWord() {
   const w = SLIDER_WORDS[currentSliderWordIdx];
+  // Speak each sound slowly then blend
   w.phonics.forEach((p, i) => {
-    setTimeout(() => speak(p, true, true), i * 800);
+    setTimeout(() => speak(p, true, true), i * 900);
   });
-  setTimeout(() => speak(w.word, false, false), w.phonics.length * 800 + 500);
+  setTimeout(() => speak(w.word, false, false), w.phonics.length * 900 + 500);
 }
 
 function resetSlider() {
-  const w = SLIDER_WORDS[currentSliderWordIdx];
-  lastLitLetter = -1;
-  sliderCompleted = false;
-  slideIsActive = false;
-  document.getElementById('slideZone').classList.remove('active');
-  document.getElementById('slideUnderline').style.width = '0%';
-  document.getElementById('sliderFullWord').classList.remove('show');
-  document.getElementById('sliderStatus').textContent = '👆 Place finger and slide slowly!';
-  for (let i = 0; i < w.sounds.length; i++) {
-    const el = document.getElementById('slb' + i);
-    if (el) el.classList.remove('lit', 'passed');
-  }
+  renderSlider();
 }
 
 function jumpSliderWord(i) {
